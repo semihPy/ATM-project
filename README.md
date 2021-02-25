@@ -1,4 +1,4 @@
-  ATM Project Details
+  In this project:
 =================================================================================================
 OOP
 	-Object Oriented Programming approach is used in the project with two classes named bank and user.
