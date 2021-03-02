@@ -1,20 +1,20 @@
-  In this project:
+  In This Project:
 =================================================================================================
 OOP
 	-Object Oriented Programming approach is used in the project with two classes named bank and user.
 
 BANK CLASS METHODS
-	-balance, deposit, withdraw, transfer.
+	-balance, deposit, withdraw, transfer and transaction_menu.
 
 USER CLASS METHODS
-	-create_account, edit_user_info, delete_account, login, logout.
+	-login, create_user, edit_user, delete_user, logout and main_menu.
 
 DATA FILES
 	-All the data is kept in text files in “users” folder not to lose any entered data.
 	-Name, email and phone number of the costumers are saved as personal data.
 
 LOGIN TO ATM
-	-To login the system user need to enter ID_no and email address.
+	-To login the system user need to enter ID_no and name.
 	-The account will be suspended after 3 failure.
 	-New account can be created unless using an existing ID_no.
 
