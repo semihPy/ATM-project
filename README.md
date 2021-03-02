@@ -26,3 +26,7 @@ UML
 
 GUI
 	-Tkinter which is a Standard GUI library of Python is used to have a graphical user interface.
+	
+	
+[atm point.pdf](https://github.com/semihPy/ATM-project/files/6072120/atm.point.pdf)
+
