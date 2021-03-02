@@ -28,5 +28,8 @@ GUI
 	-Tkinter which is a Standard GUI library of Python is used to have a graphical user interface.
 	
 	
-[atm point.pdf](https://github.com/semihPy/ATM-project/files/6072120/atm.point.pdf)
+[use_case_diagram.pdf](https://github.com/semihPy/ATM-project/files/6072293/use_case_diagram.pdf)
+[class_diagram.pdf](https://github.com/semihPy/ATM-project/files/6072296/class_diagram.pdf)
+
+
 
