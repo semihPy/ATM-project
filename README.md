@@ -29,7 +29,7 @@ GUI
 	
 	
 [use_case_diagram.pdf](https://github.com/semihPy/ATM-project/files/6072293/use_case_diagram.pdf)
-[class_diagram.pdf](https://github.com/semihPy/ATM-project/files/6072296/class_diagram.pdf)
+[classDiagram.pdf](https://github.com/semihPy/ATM-project/files/6076347/classDiagram.pdf)
 
 
 
