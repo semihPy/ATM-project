@@ -7,16 +7,16 @@ import sys
 x = datetime.datetime.now()
 t = x.strftime("%c")
 
-if os.path.isfile('bankdata.txt') and os.path.isfile('balance.txt'):
+if os.path.isfile('bankdata.txt'):
     pass
 else:
-    with open("bankdata.txt", "w"):
-        with open("balance.txt", "w"):
-            print('Necessary files created')
+    with open("bankdata.txt", "w+"):
+        # with open("balance.txt", "w+"):
+        print('Necessary txt file created')
 
 
 class User:
-    c_id = ""
+    current_user_info = []
 
     def __init__(self, name="", surname="", ID=""):
         self.name = name
@@ -24,25 +24,23 @@ class User:
         self.ID = ID
         self.email = self.name + "." + self.surname + "@csbank.com"
         self.data_list = self.read_txt('bankdata.txt')
-        self.balance_list = self.read_txt('balance.txt')
 
-    def login(self, liste):
-        while True:                             # 2 bilginin dogru girilmesiye birlikte User sinifi menusu calisir.
+    def login(self, dataList):
+        while True:  # 2 bilginin dogru girilmesiye birlikte User sinifi menusu calisir.
             print('\t'.expandtabs(12), 33 * '=' + " WELCOME, Please LOGIN first " + 33 * '=')
             print()
             self.name = input("\t\t\t Enter a current customer NAME: ")
             if self.name.isalpha() and len(self.name) > 2:
                 self.ID = input("\t\t\t Enter a current customer ID: ")
                 if self.ID.isdigit() and int(self.ID) > 0 and len(self.ID) > 2:
-                    for i in liste:
-                        if i[0] == self.ID and i[1] == self.name:
+                    for current_user in dataList:
+                        if current_user[0] == self.ID and current_user[1] == self.name:
                             print("\nWelcome {}, \nLogin is successful!".format(self.name).upper())
-                            User.c_id = self.ID             # login olan kullanicinin ID si class variable a atandi.
-                            self.main_menu(i)
-                            break
-                        else:
-                            print("---> Invalid user name or ID! Try again <---")
-                            break
+                            User.current_user_info = current_user
+                            print(User.current_user_info)
+                            self.main_menu(current_user)
+                    else:
+                        print("---> Invalid user NAME or ID! Try again <---")
                 else:
                     print("You have to enter least 3 DIGIT!")
             else:
@@ -55,7 +53,7 @@ class User:
                 self.name = input("Enter a NAME: ")
                 self.surname = input("Enter a SURNAME: ")
                 self.ID = input("Enter a ID No: ")
-                Bank.balance = int(input("The amount of money deposited:"))
+                money = input("The amount of MONEY deposited:")
                 self.email = self.name + "." + self.surname + "@csbank.com"
                 if len(self.ID) > 2 and len(self.name) > 2:
                     break
@@ -74,38 +72,20 @@ class User:
                 f.write(self.ID + "\t\t")
                 f.write(self.name + "\t\t")
                 f.write(self.surname + "\t\t")
-                f.write(self.email + "  \n")
+                f.write(self.email + "\t\t")
+                f.write(money + "\t\t")  # mevcut balans i txt ye yazdim.
+                f.write(t + " \n")  # islem tarihini txt ye yazdim.
                 f.seek(0)
+                print("Registration is done!")
 
-            with open("balance.txt", "r+") as text:
-                for line in text:
-                    line = line.rstrip()
-                text.write(self.ID + "\t\t")  # user class tan alinan musteri numarasini txt ye yazdim.
-                text.write(str(Bank.balance) + "\t\t")  # mevcut balans i txt ye yazdim.
-                text.write(t + " \n")  # islem tarihini txt ye yazdim.
-                print("Registration is done! \nYou must have again login..")
-
-    def read_txt(self, file):
-        f = open(file, 'r')
+    def read_txt(self, file_txt):
+        f = open(file_txt, 'r')
         lines_list = []
         for line in f:
             line = line.rstrip().split("\t\t")
             lines_list.append(line)
         f.close()
-        return lines_list  # lines_list = musteri bilgileri listelerinin listesi
-
-    def write_txt(self):
-        with open("bankdata.txt", "w+") as f:
-            for i in self.data_list:
-                for j in i:
-                    f.write(j + '\t\t')
-                f.write('\n')
-
-        with open("balance.txt", "w+") as f:
-            for i in self.balance_list:
-                for j in i:
-                    f.write(j + '\t\t')
-                f.write('\n')
+        return lines_list  # lines_list = TUM musteri bilgileri listelerinin listesi
 
     def fileInput(self, searchExp, replaceExp):
         for line in fileinput.input('bankdata.txt', inplace=1):
@@ -113,38 +93,37 @@ class User:
                 line = line.replace(searchExp, replaceExp)
             sys.stdout.write(line)
 
-    def find_user(self):
+    def find_user(self, id):
         for i in self.data_list:
-            if i[0] == u.c_id:
+            if i[0] == id:
                 return i
 
-    def edit_user(self, i):  # liste = musteri bilgileri listesi
+    def edit_user(self):  # liste = [id,name,surname,email,balance,date] currrent customer info.
+        f = self.find_user(User.current_user_info[0])
         q = input("Which information will be updated? \nNAME    --> 1, \nSURNAME --> 2 \ne-mail  --> 3 \nChoice:..")
         if q == '1':
             new_name = input("Enter a NEW name:")
-            self.fileInput(i[1], new_name)
+            self.fileInput(f[1], new_name)
+            self.fileInput(f[5], t)
             print("The name has been changed \nYou must have again login..")
-            self.main_menu(i)
         if q == '2':
             new_surname = input("Enter a NEW surname:")
-            self.fileInput(i[2], new_surname)
+            self.fileInput(f[2], new_surname)
+            self.fileInput(f[5], t)
             print("The surname has been changed \nYou must have again login..")
-            self.main_menu(i)
         if q == '3':
             new_email = input("Enter a NEW email:")
-            self.fileInput(i[3], new_email)
+            self.fileInput(f[3], new_email)
+            self.fileInput(f[5], t)
             print("The mail has been changed \nYou must have again login..")
-            self.main_menu(i)
-        else:
-            print("Something went wrong. Try again later..")
-            exit()
+        self.logout()
 
     def start(self):
         if len(self.data_list) == 0:
-            self.data_list.append(['111', 'semih', 'can', 'semih.can@csbank.com'])
-            self.balance_list.append(['111', '200', t])
-            self.write_txt()
-        self.login(self.data_list)
+            self.data_list.append(['111', 'semih', 'can', 'semih.can@csbank.com', '100', t])
+            u.login(self.data_list)
+        else:
+            u.login(self.data_list)
 
     def logout(self):
         print("{} quit the application..".format(self.name).upper())
@@ -152,7 +131,7 @@ class User:
 
     def delete_user(self):
         f = open("bankdata.txt", "r+")
-        n = open("bankdata2.txt", "w+")
+        copy = open("bankdata2.txt", "w+")
         self.name = input("Enter customer NAME to be deleted: ")
         self.surname = input("Enter customer SURNAME to be deleted: ")
         self.ID = input("Enter customer ID to be deleted: ")
@@ -163,16 +142,15 @@ class User:
                 print("Your account is DELETED! ")
                 continue
             else:
-                n.write(line)
+                copy.write(line)
         f = open("bankdata.txt", "w")  # ilk dosyanin icini sildim.
-        with open("bankdata2.txt", "r+") as n:
+        with open("bankdata2.txt", "r+") as copy:
             with open("bankdata.txt", "w+") as f:
-                for line in n:
+                for line in copy:
                     f.write(line)
-        i = self.find_user()
-        self.main_menu(i)
+        self.logout()
 
-    def main_menu(self, i):
+    def main_menu(self, i): # i = current_user list.
         while True:
             menu = ["+------ Welcome to C&S Bank ------+",
                     "|  1. NEW Customer                |",
@@ -187,7 +165,7 @@ class User:
             if choice == "1":
                 u.create_user()  # User class in create_user() methodu calisir.
             elif choice == "2":
-                u.edit_user(i)  # User class in edit_user() methodu calisir.
+                u.edit_user()  # User class in edit_user() methodu calisir.
             elif choice == "3":
                 u.delete_user()  # User class in delete_user() methodu calisir.
             elif choice == "4":
@@ -197,88 +175,71 @@ class User:
             else:
                 print("Something went wrong. Try again later..")
 
+
 class Bank(User):
-    c_balance = 0
 
     def __init__(self, balance=''):
         super().__init__()
         self.balance = balance
 
-    def fileInput(self, searchExp, replaceExp):
-        for line in fileinput.input('balance.txt', inplace=1):
-            if searchExp in line:
-                line = line.replace(searchExp, replaceExp)
-            sys.stdout.write(line)
+    def getBalance(self, currentUserInfo):
+        b = User.find_user(self, currentUserInfo[0])
+        print("your balance: {}$ \nLast transaction date: {}".format(b[4], b[5]))
+        return b[4]
 
-    def getBalance(self, liste):
-        for i in liste:
-            if i[0] == User.c_id:
-                Bank.c_balance = int(i[1])
-                print("your balance: {}$ \nLast transaction date: {}".format(Bank.c_balance, i[2]))
+    def deposit(self, currentUserInfo):
+        amount = int(input("Enter the amount to DEPOSIT: "))
+        a = int(currentUserInfo[4])
+        a += amount
+        print("\nYour current BALANCE is:", a, '$')
+        b = User.find_user(self, currentUserInfo[0])
+        self.fileInput(b[4], str(a))
+        self.fileInput(b[5], t)
+        u.logout()
 
-    def deposit(self, liste):
-        for i in liste:
-            if i[0] == User.c_id:
-                amount = int(input("Enter the amount to DEPOSIT: "))
-                Bank.c_balance = int(i[1])
-                Bank.c_balance += amount
-                Bank.c_balance = str(c.c_balance)
-                self.fileInput(i[1], Bank.c_balance)
-                self.fileInput(i[2], t)
-                print("\nYour current BALANCE is:", Bank.c_balance + '$')
-                u.logout()
+    def withdraw(self, currentUserInfo):
+        amount = int(input("Enter the amount to WITHDRAW: "))
+        a = int(currentUserInfo[4])
+        if a >= amount:
+            a -= amount
+            print("\nYour current BALANCE is:", a, '$')
+            b = User.find_user(self, currentUserInfo[0])
+            self.fileInput(b[4], str(a))
+            self.fileInput(b[5], t)
+            u.logout()
+        else:
+            print("\nBalance is insufficient  ")
+            print("\nYour current BALANCE is:", a, '$')
 
-    def withdraw(self, liste):
-        for i in liste:
-            if i[0] == User.c_id:
-                amount = int(input("Enter the amount to WITHDRAW: "))
-                Bank.c_balance = int(i[1])
-                if Bank.c_balance >= amount:
-                    Bank.c_balance -= amount
-                    Bank.c_balance = str(Bank.c_balance)
-                    self.fileInput(i[1], Bank.c_balance)
-                    self.fileInput(i[2], t)
-                    print("\nYour current BALANCE is:", Bank.c_balance + '$')
-                    u.logout()
-                else:
-                    print("\nBalance is insufficient  ")
-                    print("\nYour current BALANCE is:", Bank.c_balance + '$')
-
-    def transfer(self, liste):
-        for i in liste:
-            if i[0] == User.c_id:
-                Bank.c_balance = int(i[1])  # login olan kullanicinin balans i class variable a atandi.
-                print("You have", Bank.c_balance, '$')
+    def transfer(self, currentUserInfo):
+        self.getBalance(currentUserInfo)
         id_number = input("Enter the ID of Customer to be transferred: ")
-        if id_number != User.c_id:
-            for i in liste:
-                if i[0] == id_number:
+        if id_number != currentUserInfo[0]:
+            for j in self.data_list:
+                if j[0] == id_number:
                     print("Client has been found")
                     break
-            try:
-                amount = int(input("Enter the AMOUNT to transfer: "))
-                if Bank.c_balance >= amount:
-                    Bank.c_balance -= amount
-                    Bank.c_balance = str(Bank.c_balance)
-                    for i in liste:
-                        if i[0] == User.c_id:
-                            self.fileInput(i[1], Bank.c_balance)
-                            self.fileInput(i[2], t)
 
-                        if i[0] == id_number:
-                            result = int(i[1]) + amount
-                            result = str(result)
-                            self.fileInput(i[1], result)
-                            self.fileInput(i[2], t)
+            amount = int(input("Enter the AMOUNT to transfer: "))
+            a = int(currentUserInfo[4])
+            if a >= amount:
+                a -= amount
+                b = User.find_user(self, currentUserInfo[0])
+                self.fileInput(b[4], str(a))
+                self.fileInput(b[5], t)
 
-                    print("Transfer done! \nYou must have again login..")
-                    self.transaction_menu()
-                else:
-                    print("\nBalance is insufficient  ")
-                    print("\nYour current balance is:", self.balance + '$')
-                    self.transaction_menu()
-            except ValueError:
-                print("The input was not a valid amount.")
+                f = User.find_user(self, id_number)
+                result = int(f[4])
+                result += amount
+                self.fileInput(f[4], str(result))
+                self.fileInput(f[5], t)
+
+                print("Transfer done! \nYou must have again login..")
+                self.transaction_menu()
+            else:
+                print("\nBalance is insufficient  ")
+                print("\nYour current balance is:", self.getBalance(currentUserInfo) + '$')
+                self.transaction_menu()
         else:
             print("Error! Both the same account number..\nExits the application.")
             exit()
@@ -295,21 +256,18 @@ class Bank(User):
             for i in menu:
                 print('\t'.expandtabs(55), i)
             choice = input("Enter your choice:...")
-            c = Bank()
             if choice == "1":
-                c.getBalance(self.balance_list)
+                c.getBalance(User.current_user_info)
             elif choice == "2":
-                c.deposit(self.balance_list)
+                c.deposit(User.current_user_info)
             elif choice == "3":
-                c.withdraw(self.balance_list)
+                c.withdraw(User.current_user_info)
             elif choice == "4":
-                c.transfer(self.balance_list)
+                c.transfer(User.current_user_info)
             elif choice == "5":
-                for i in self.data_list:
-                    if i[0] == User.c_id:
-                        self.main_menu(i)
+                c.main_menu(User.current_user_info)
             elif choice == "6":
-                u.logout()
+                c.logout()
             else:
                 print("Something went wrong. Try again Please...")
 
